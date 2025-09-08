@@ -43,6 +43,119 @@ generations.</div>
       </div>
     </div>
   </section>
+<!-- MAIN CONTENT -->
+  <main class="container">
+    <div class="main">
+
+      <!-- CATEGORIES -->
+      <aside>
+        <div class="card categories">
+          <h3 style="margin:0 0 10px 0">Categories</h3>
+          <div id="categoryList">
+            <!-- dynamic category buttons -->
+            <div style="color:var(--muted);font-size:13px">Loading categories...</div>
+          </div>
+        </div>
+      </aside>
+       <!-- CARDS -->
+      <section id="trees-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <h2 style="margin:0">Choose Your Trees</h2>
+          <div id="status" class="muted"> </div>
+        </div>
+
+        <div class="card">
+          <div id="cardsWrap" class="cards-grid">
+            <!-- tree cards inserted here -->
+          </div>
+
+          <div id="spinner" class="spinner hidden">
+            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+          </div>
+
+          <div id="noItems" class="muted" style="text-align:center;padding:18px;display:none">No trees found.</div>
+        </div>
+      </section>
+
+      <!-- CART -->
+      <aside>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h3 style="margin:0">Your Cart</h3>
+            <button id="clearCartBtn" style="background:#eef7ef;border:none;padding:6px 10px;border-radius:8px;cursor:pointer">Clear</button>
+          </div>
+
+          <div id="cartList" class="cart-list" style="margin-top:12px">
+            <div class="muted">No trees added yet.</div>
+          </div>
+
+          <div style="border-top:1px dashed #e6f0ea;margin-top:12px;padding-top:12px;display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:700">Total</div>
+            <div id="totalPrice" style="font-weight:800">৳ 0</div>
+          </div>
+
+          <button style="margin-top:12px;background:var(--green);color:white;border:none;padding:10px;border-radius:8px;cursor:pointer;width:100%">Checkout</button>
+        </div>
+      </aside>
+
+    </div>
+<!-- ABOUT -->
+    <section id="about" class="section-about">
+      <h2>About the Campaign</h2>
+      <div class="two-col card" style="margin-top:12px;align-items:center">
+        <img src="assets/about.png" alt="plant" style="width:100%;height:530px;border-radius:8px">
+        <div>
+          <p style="color:var(--muted)">Green Earth's afforestation campaign supports tree planting in urban and rural areas, funds saplings, soil prep, community training and aftercare. Choose from fruit trees, shade trees, and coastal species that suit local climates.</p>
+          <p style="margin-top:10px;color:var(--muted)">Your contribution plants a tree, empowers communities, and helps capture carbon.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMPACT -->
+    <section id="impact" class="impact-section" >
+      <h2>Our Impact</h2>
+      <div class="impact" style="margin-top:12px">
+        <div class="stat card"><div style="font-size:20px;color:var(--success)">500K+</div><div class="muted">Trees Planted</div></div>
+        <div class="stat card"><div style="font-size:20px;color:var(--success)">120+</div><div class="muted">Community Partners</div></div>
+        <div class="stat card"><div style="font-size:20px;color:var(--success)">30+</div><div class="muted">Active Projects</div></div>
+      </div>
+    </section>
+
+    <!-- FORM -->
+    <section class="section-form">
+      <h2>Plant a Tree Today</h2>
+      <div style="margin: 0px auto; max-width: 540px;" class="card1">
+        <form id="donateForm" class="card2" onsubmit="return false">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <input id="donorName" placeholder="Your Name" required />
+            <input id="donorEmail" type="email" placeholder="Email Address" required />
+            <select id="donorQty">
+              <option value="">Number of Trees</option>
+              <option value="1">1</option>
+              <option value="3">3</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+            </select>
+            <button id="donateBtn" style="background:var(--accent);border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:700">Donate Now</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">© 2025 Green Earth — All rights reserved.</div>
+  </footer>
+ <!-- MODAL -->
+  <div id="modalBackdrop" class="modal-backdrop hidden" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="close" onclick="closeModal()">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+
 
 </body>
 </html>
