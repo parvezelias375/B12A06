@@ -45,3 +45,32 @@
         border:none;
         cursor:pointer}
 
+ /* HERO */
+    .hero{position:relative;
+        padding:42px 0 64px;
+        background:rgba(207, 240, 220, 1);
+        text-align:center;
+        overflow:hidden}
+    .hero .title{font-size:28px;
+        font-weight:800;
+        margin:6px 0}
+    .hero .sub{color:var(--muted);
+        margin-bottom:16px}
+    .hero .cta{background:var(--green);
+        color:#fff;
+        padding:10px 20px;
+        border-radius:10px;
+        border:none;
+        cursor:pointer;
+        font-weight:700}
+    .leaf-left,.leaf-right{position:absolute;
+        top:28px;
+        width:240px;
+        opacity:.9;
+        pointer-events:none;
+        filter:drop-shadow(0 12px 30px rgba(0,0,0,0.12))}
+    .leaf-left{left:-40px;
+        transform:rotate(-6deg)}
+    .leaf-right{right:-40px;
+        transform:rotate(-6deg) }
+
