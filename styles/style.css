@@ -12,7 +12,7 @@
     *{box-sizing:border-box}
     body{
       margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
-      background:var(--bg);color:#0f172a;line-height:1.4;
+      background:rgba(240, 253, 244, 1);color:#0f172a;line-height:1.4;
     }
 
  /* NAV */
@@ -75,10 +75,11 @@
         transform:rotate(-6deg) }
 
  /* MAIN GRID */
-    .main{display:grid;
+  .main{display:grid;
         grid-template-columns:1fr;
         gap:20px;
-        padding:28px 0}
+        padding:28px 0;
+        margin:0}
     @media(min-width:900px){ .main{grid-template-columns:260px 1fr 300px} }
 
     /* CATEGORIES */
@@ -192,13 +193,27 @@
     max-width: 1100px;
 text-align: center;
 background: none;}
+.about-text{ color: var(--Neutral/Dark, rgba(31, 41, 55, 1));
+font-family: Inter;
+font-size: 16px;
+font-weight: 400;
+line-height: 24px;
+letter-spacing: 0%;
+text-align: left;}
+.about-list{color: var(--Neutral/Dark, rgba(31, 41, 55, 1));
+font-family: Inter;
+font-size: 16px;
+font-weight: 400;
+line-height: 24px;
+letter-spacing: 0%;
+text-align: left;}
     .two-col{display:flex;
         justify-content: center;
         
         gap:18px;
     background: none; 
 border: none;  }
-    @media(min-width:900px){ .two-col{grid-template-columns:360px 1fr} }
+ @media(min-width:900px){ .two-col{grid-template-columns:360px 1fr} }
     .impact{display:grid;grid-template-columns:1fr;gap:12px}
     @media(min-width:800px){ .impact{grid-template-columns:repeat(3,1fr)} }
     .impact .stat{padding:18px;border-radius:10px;background:var(--card);text-align:center;font-weight:700}
@@ -215,8 +230,6 @@ border: none;  }
     }
     .section-form{background:  rgba(22, 101, 52, 1);
         padding:28px 0;
-        
-        
         text-align: center;
         color: white;
         
@@ -238,7 +251,7 @@ background: rgba(21, 128, 61, 1);
         color:white;
         padding:18px;
         text-align:center;
-        margin-top:18px}
+       }
 
     /* MODAL (simple) */
     .modal-backdrop{position:fixed;

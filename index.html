@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="styles/style.css" />
 </head>
 <body>
+
+  <div class="container cusosada">
+
+  </div>
+
    <!-- NAVBAR -->
   <header>
     <div class="container nav">
@@ -104,15 +109,20 @@ generations.</div>
       <h2>About the Campaign</h2>
       <div class="two-col card" style="margin-top:12px;align-items:center">
         <img src="assets/about.png" alt="plant" style="width:100%;height:530px;border-radius:8px">
-        <div>
-          <p style="color:var(--muted)">Green Earth's afforestation campaign supports tree planting in urban and rural areas, funds saplings, soil prep, community training and aftercare. Choose from fruit trees, shade trees, and coastal species that suit local climates.</p>
-          <p style="margin-top:10px;color:var(--muted)">Your contribution plants a tree, empowers communities, and helps capture carbon.</p>
+        <div class="about-text">
+          <p style="color:var(--muted)">Green Earth is a global tree plantation initiative dedicated to fighting climate change. Since our start, we’ve planted over 500,000 trees worldwide. By joining our campaign, you help restore forests, create habitats for wildlife, and combat global warming.</p>
+          <p style="margin-top:10px;" ><ul>
+            <li class="about-list">Restoration of natural habitats</li>
+            <li>Improvement of air quality</li>
+            <li>for local communities</li>
+          </ul></p>
         </div>
       </div>
-    </section>
+    </section> 
 
-    <!-- IMPACT -->
-    <section id="impact" class="impact-section" >
+  </main>
+  <!-- IMPACT -->
+      <section id="impact" class="impact-section" >
       <h2>Our Impact</h2>
       <div class="impact" style="margin-top:12px">
         <div class="stat card"><div style="font-size:20px;color:var(--success)">500K+</div><div class="muted">Trees Planted</div></div>
@@ -120,8 +130,7 @@ generations.</div>
         <div class="stat card"><div style="font-size:20px;color:var(--success)">30+</div><div class="muted">Active Projects</div></div>
       </div>
     </section>
-
-    <!-- FORM -->
+<!-- FORM -->
     <section class="section-form">
       <h2>Plant a Tree Today</h2>
       <div style="margin: 0px auto; max-width: 540px;" class="card1">
@@ -141,9 +150,6 @@ generations.</div>
         </form>
       </div>
     </section>
-
-  </main>
-
   <footer>
     <div class="container">© 2025 Green Earth — All rights reserved.</div>
   </footer>
@@ -155,6 +161,284 @@ generations.</div>
     </div>
   </div>
 
+ <script>
+    /* -------------------------
+       Configuration & State
+       ------------------------- */
+    const API_ALL_PLANTS = 'https://openapi.programming-hero.com/api/plants';
+    const API_ALL_CATS   = 'https://openapi.programming-hero.com/api/categories';
+    const API_CAT        = id => `https://openapi.programming-hero.com/api/category/${id}`;
+    const API_DETAIL     = id => `https://openapi.programming-hero.com/api/plant/${id}`;
+
+    let cart = JSON.parse(localStorage.getItem('ge_cart') || '[]');
+    let activeCategory = localStorage.getItem('ge_active_cat') || null;
+
+    const categoryListEl = document.getElementById('categoryList');
+    const cardsWrap = document.getElementById('cardsWrap');
+    const spinner = document.getElementById('spinner');
+    const noItems = document.getElementById('noItems');
+    const status = document.getElementById('status');
+    const cartList = document.getElementById('cartList');
+    const totalPriceEl = document.getElementById('totalPrice');
+    const clearCartBtn = document.getElementById('clearCartBtn');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const modalContent = document.getElementById('modalContent');
+
+    /* -------------------------
+       Helpers
+       ------------------------- */
+    function showSpinner(show){
+      spinner.classList.toggle('hidden', !show);
+    }
+    function money(n){ return '৳ ' + (Number(n) || 0) }
+    function saveCart(){
+      localStorage.setItem('ge_cart', JSON.stringify(cart));
+    }
+    function saveActiveCategory(id){
+      if(id) localStorage.setItem('ge_active_cat', id); else localStorage.removeItem('ge_active_cat');
+    }
+
+    function normalizePlant(p){
+      // Make resilient to slight API differences
+      return {
+        id: p.id || p._id || p.plant_id || (p.plant && p.plant.id) || '',
+        name: p.name || p.title || p.plant_name || (p.plant && p.plant.name) || 'Tree',
+        price: Number(p.price || p.cost || p.amount || 0),
+        category: p.category || p.category_name || p.type || '',
+        image: p.image || p.img || p.thumbnail || 'https://images.unsplash.com/photo-1526401485004-2fda9f4b8d77?q=80&w=1000&auto=format&fit=crop',
+        description: p.description || p.short_description || p.details || ''
+      };
+    }
+
+    /* -------------------------
+       Categories
+       ------------------------- */
+    async function loadCategories(){
+      categoryListEl.innerHTML = '<div style="color:var(--muted);font-size:13px">Loading categories...</div>';
+      try{
+        const res = await fetch(API_ALL_CATS);
+        const data = await res.json();
+        const cats = data?.data || data?.categories || [];
+        categoryListEl.innerHTML = '';
+        // "All" button
+        const allBtn = document.createElement('button');
+        allBtn.textContent = 'All Trees';
+        allBtn.onclick = ()=>{
+          setActiveBtn(allBtn, null);
+          loadAllPlants();
+        };
+        categoryListEl.appendChild(allBtn);
+
+        cats.forEach(cat=>{
+          const id = cat?.id || cat?.category_id || cat?._id || '';
+          const label = cat?.category || cat?.category_name || cat?.name || 'Category';
+          const btn = document.createElement('button');
+          btn.textContent = label;
+          btn.dataset.id = id;
+          btn.onclick = ()=> { setActiveBtn(btn, id); onCategoryClick(id) };
+          categoryListEl.appendChild(btn);
+        });
+
+        // set active if stored
+        let btnToActivate = null;
+        if(activeCategory){
+          btnToActivate = [...categoryListEl.querySelectorAll('button')].find(b=> b.dataset.id === activeCategory);
+        }
+        if(!btnToActivate) btnToActivate = categoryListEl.querySelector('button'); // "All"
+
+        if(btnToActivate) { setActiveBtn(btnToActivate, btnToActivate.dataset.id || null); if(btnToActivate.dataset.id) onCategoryClick(btnToActivate.dataset.id); else loadAllPlants(); }
+      }catch(err){
+        categoryListEl.innerHTML = '<div style="color:var(--danger);font-size:13px">Failed to load categories</div>';
+        console.error(err);
+      }
+    }
+
+    function setActiveBtn(btn, id){
+      [...categoryListEl.querySelectorAll('button')].forEach(b=> b.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+      activeCategory = id;
+      saveActiveCategory(id);
+    }
+
+    /* -------------------------
+       Plants / Cards
+       ------------------------- */
+    async function loadAllPlants(){
+      status.textContent = 'Loading plants...';
+      showSpinner(true);
+      noItems.style.display = 'none';
+      try{
+        const res = await fetch(API_ALL_PLANTS);
+        const data = await res.json();
+        const plants = data?.data || data?.plants || [];
+        renderCards(plants);
+        status.textContent = '';
+      }catch(err){
+        console.error(err);
+        status.textContent = 'Failed to load plants';
+      }finally{ showSpinner(false) }
+    }
+
+    async function onCategoryClick(id){
+      status.textContent = 'Loading category...';
+      showSpinner(true);
+      noItems.style.display = 'none';
+      try{
+        const res = await fetch(API_CAT(id));
+        const data = await res.json();
+        const plants = data?.data || data?.plants || [];
+        renderCards(plants);
+        status.textContent = '';
+      }catch(err){
+        console.error(err);
+        status.textContent = 'Failed to load category';
+        cardsWrap.innerHTML = '';
+      }finally{ showSpinner(false) }
+    }
+
+    function renderCards(plants){
+      cardsWrap.innerHTML = '';
+      if(!plants || plants.length === 0){
+        noItems.style.display = 'block';
+        return;
+      }
+      noItems.style.display = 'none';
+      plants.forEach(p=>{
+        const plant = normalizePlant(p);
+        const card = document.createElement('article');
+        card.className = 'plant-card';
+        card.innerHTML = `
+          <img loading="lazy" src="${plant.image}" alt="${escapeHtml(plant.name)}" />
+          <div class="body">
+            <div class="plant-title" data-id="${plant.id}">${escapeHtml(plant.name)}</div>
+            <div class="plant-desc">${escapeHtml((plant.description||'').slice(0,120))}${(plant.description && plant.description.length>120)?'...':''}</div>
+            <div class="plant-meta">
+              <div class="muted">${escapeHtml(plant.category || '—')}</div>
+              <div style="font-weight:800">${money(plant.price)}</div>
+            </div>
+            <button class="add-btn">Add to Cart</button>
+          </div>
+        `;
+        // listeners
+        card.querySelector('.add-btn').addEventListener('click', ()=> addToCart({id:plant.id,name:plant.name,price:plant.price}));
+        card.querySelector('.plant-title').addEventListener('click', ()=> openDetail(plant.id));
+        cardsWrap.appendChild(card);
+      });
+    }
+
+    /* -------------------------
+       Detail modal
+       ------------------------- */
+    async function openDetail(id){
+      modalContent.innerHTML = '<div style="padding:20px;text-align:center" class="muted">Loading...</div>';
+      modalBackdrop.classList.remove('hidden');
+      try{
+        const res = await fetch(API_DETAIL(id));
+        const data = await res.json();
+        const p = normalizePlant(data?.data || data?.plant || data || {});
+        modalContent.innerHTML = `
+          <div style="display:grid;grid-template-columns:1fr;gap:12px">
+            <img src="${p.image}" alt="${escapeHtml(p.name)}" style="width:100%;height:320px;object-fit:cover;border-radius:8px" />
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h3 style="margin:0">${escapeHtml(p.name)}</h3>
+                <div class="muted" style="margin-top:6px">${escapeHtml(p.category || '')}</div>
+              </div>
+              <div style="font-weight:800">${money(p.price)}</div>
+            </div>
+            <p class="muted">${escapeHtml(p.description || 'No description available.')}</p>
+            <div style="display:flex;gap:8px">
+              <button id="modalAddBtn" style="background:var(--success);color:white;padding:10px;border-radius:8px;border:none;cursor:pointer">Add to Cart</button>
+              <button onclick="closeModal()" style="background:#eef7ef;border:none;padding:10px;border-radius:8px;cursor:pointer">Close</button>
+            </div>
+          </div>
+        `;
+        document.getElementById('modalAddBtn').addEventListener('click', ()=> { addToCart({id:p.id,name:p.name,price:p.price}); closeModal(); });
+      }catch(err){
+        console.error(err);
+        modalContent.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger)">Failed to load details.</div>';
+      }
+    }
+    function closeModal(e){
+      if(e && e.target !== modalBackdrop) return;
+      modalBackdrop.classList.add('hidden');
+      modalContent.innerHTML = '';
+    }
+
+    /* -------------------------
+       Cart management
+       ------------------------- */
+    function addToCart(item){
+      cart.push(item);
+      saveCart();
+      renderCart();
+    }
+    function removeFromCart(index){
+      if(index>=0 && index<cart.length) cart.splice(index,1);
+      saveCart();
+      renderCart();
+    }
+    function clearCart(){
+      if(!confirm('Clear the cart?')) return;
+      cart = [];
+      saveCart();
+      renderCart();
+    }
+    function renderCart(){
+      cartList.innerHTML = '';
+      if(cart.length === 0){
+        cartList.innerHTML = '<div class="muted">No trees added yet.</div>';
+      } else {
+        cart.forEach((c,idx)=>{
+          const r = document.createElement('div');
+          r.className = 'cart-row';
+          r.innerHTML = `<div class="name">${escapeHtml(c.name)}</div>
+                         <div style="display:flex;align-items:center;gap:10px">
+                           <div class="price">${money(c.price)}</div>
+                           <button class="remove" title="Remove">✖</button>
+                         </div>`;
+          r.querySelector('.remove').addEventListener('click', ()=> removeFromCart(idx));
+          cartList.appendChild(r);
+        });
+      }
+      const sum = cart.reduce((acc,c)=> acc + (Number(c.price)||0), 0);
+      totalPriceEl.textContent = money(sum);
+    }
+
+    clearCartBtn.addEventListener('click', clearCart);
+
+    /* -------------------------
+       Donate form (simple feedback)
+       ------------------------- */
+    document.getElementById('donateBtn').addEventListener('click', ()=>{
+      const name = document.getElementById('donorName').value.trim();
+      const email = document.getElementById('donorEmail').value.trim();
+      const qty = document.getElementById('donorQty').value;
+      if(!name || !email || !qty){ alert('Please fill all fields.'); return; }
+      alert(`Thank you ${name}! Donation request (${qty} tree(s)) received.`)
+      document.getElementById('donorName').value = '';
+      document.getElementById('donorEmail').value = '';
+      document.getElementById('donorQty').value = '';
+    });
+
+    /* -------------------------
+       Utilities
+       ------------------------- */
+    function escapeHtml(s){
+      if(!s) return '';
+      return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+    }
+
+    /* -------------------------
+       Init
+       ------------------------- */
+    (function init(){
+      renderCart();
+      loadCategories();
+      // if no active category stored, load all
+      if(!activeCategory) loadAllPlants();
+    })();
+  </script>
 
 
 </body>
