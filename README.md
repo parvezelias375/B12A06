@@ -86,15 +86,29 @@ https://openapi.programming-hero.com/api/plant/1
 
 
 #### 1) What is the difference between var, let, and const?
+ans:
+var -> Can be re-declared and updated.
+let -> Can be updated, but not re-declared in the same scope.
+const -> Neither re-declared nor updated (value is constant).
 
 #### 2) What is the difference between map(), forEach(), and filter()? 
+ans:
+map() -> Creates a new array by applying a function to each element.Does not change the original array.Always returns the same length as the original array.
+
+forEach() -> Loops through each element, executes a function.Does not return anything (returns undefined).Used for side effects (e.g., printing, updating external variables).
 
 #### 3) What are arrow functions in ES6?
+Ans: Arrow functions are a shorter way to write functions in JavaScript (introduced in ES6).
 
 #### 4) How does destructuring assignment work in ES6?
-
+Ans: Destructuring allows you to unpack values from arrays or properties from objects into distinct variables in a clean, short way.
 #### 5) Explain template literals in ES6. How are they different from string concatenation?
+Ans: Template Literals (ES6) -> Template literals are a modern way of working with strings in JavaScript. Instead of using quotes (' ' or " "), they use backticks (`).
 
+Difference from String Concatenation ->
+With string concatenation, you must manually join strings and variables using +, which becomes messy and harder to read.
+With template literals, you can insert variables directly with ${ }, making the syntax much cleaner.
+Template literals also support multi-line strings naturally, while concatenation requires special escape characters (\n).
 ## ⚙️ Functionalities 
 
 1) Category Loading 
